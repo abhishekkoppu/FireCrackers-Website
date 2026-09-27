@@ -1,0 +1,12 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "spark-co-fireworks",
+	"compatibility_date": "2026-09-26",
+	"pages_build_output_dir": "./dist",
+	"kv_namespaces": [
+		{
+			"binding": "PRODUCTS",
+			"id": "b5f457648d0b4c549a7d8410aa37e6fd"
+		}
+	]
+}
