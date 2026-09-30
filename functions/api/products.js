@@ -32,6 +32,8 @@ function isValidProduct(product) {
     && product.stock <= 1_000_000
     && (product.inventorySet === undefined || typeof product.inventorySet === 'boolean')
     && isSafeImage(product.image)
+    && (product.galleryImages === undefined || (Array.isArray(product.galleryImages) && product.galleryImages.length <= 2 && product.galleryImages.every(isSafeImage)))
+    && (product.galleryAttributions === undefined || (Array.isArray(product.galleryAttributions) && product.galleryAttributions.length <= 2 && product.galleryAttributions.every((item) => item === null || (item && typeof item.creator === 'string' && item.creator.length <= 100 && isHttpsUrl(item.source) && typeof item.license === 'string' && item.license.length <= 40 && isHttpsUrl(item.licenseUrl)))))
     && (product.video === '' || product.video === undefined || isHttpsUrl(product.video))
     && (product.description === undefined || (typeof product.description === 'string' && product.description.length <= 220))
 }

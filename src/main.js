@@ -100,10 +100,12 @@ document.querySelector('#app').innerHTML = `
             <div class="form-row"><label>Price (INR)<input name="price" id="admin-price" type="number" min="0" step="1" required placeholder="599"></label><label>Stock (packs)<input name="stock" id="admin-stock" type="number" min="0" step="1" placeholder="0" disabled></label></div>
             <label class="inventory-check"><input id="admin-stock-confirmed" type="checkbox"> Stock count is verified</label>
             <label>Image URL<input name="image" id="admin-image-url" type="text" inputmode="url" placeholder="https://... or upload an image"></label>
+            <label>Additional photo 2 URL<input name="galleryImage2" id="admin-gallery-image-2" type="url" placeholder="https://..."></label>
+            <label>Additional photo 3 URL<input name="galleryImage3" id="admin-gallery-image-3" type="url" placeholder="https://..."></label>
             <label>Upload image<input name="imageFile" id="admin-image-file" type="file" accept="image/*"><small>Images are resized before upload.</small></label>
             <img class="admin-image-preview" id="admin-image-preview" alt="Product image preview" hidden>
             <label>Image credit<input name="creator" id="admin-creator" maxlength="100" placeholder="Seller-provided image"></label>
-            <label>Video URL<input name="video" id="admin-video-url" type="url" placeholder="https://youtube.com/... or another video page"></label>
+            <label>Video URL<input name="video" id="admin-video-url" type="url" placeholder="YouTube or direct MP4/WebM/OGV URL"><small>Plays muted for 8 seconds when the product opens.</small></label>
             <label>Product details<textarea name="description" id="admin-description" rows="3" maxlength="220" placeholder="Short product details"></textarea></label>
             <button class="button button-coral" type="submit">Save product <span aria-hidden="true">↗</span></button>
             <p class="admin-status" id="admin-status" aria-live="polite"></p>
@@ -151,9 +153,9 @@ navigation.addEventListener('click', (event) => {
 })
 
 const seedProducts = [
-  { id: 'anar', name: 'Anar flower fountain', kind: 'Ground fountain', pack: '3-piece pack', price: 599, stock: 0, inventorySet: false, image: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Firecracker_Flowerpot.jpg', imageAlt: 'Flowerpot firework fountain in use', creator: 'Swetha01', source: 'https://commons.wikimedia.org/wiki/File:Firecracker_Flowerpot.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' },
-  { id: 'phuljhari', name: 'Phuljhari sparklers', kind: 'Hand-held sparkler', pack: '10-piece pack', price: 249, stock: 0, inventorySet: false, image: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Fireworks_Sparklers_Diwali_India.jpg', imageAlt: 'Sparklers being enjoyed during Diwali in India', creator: 'Sean Ellis', source: 'https://commons.wikimedia.org/wiki/File:Fireworks_Sparklers_Diwali_India.jpg', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/' },
-  { id: 'chakri', name: 'Chakri celebration set', kind: 'Spinning ground firework', pack: '5-piece pack', price: 799, stock: 0, inventorySet: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Spinning_Fire.jpg?download=1', imageAlt: 'A spinning chakri firework in use in West Bengal', creator: 'Dey.sandip', source: 'https://commons.wikimedia.org/wiki/File:Spinning_Fire.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+  { id: 'anar', name: 'Anar flower fountain', kind: 'Ground fountain', pack: '3-piece pack', price: 599, stock: 0, inventorySet: false, image: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Firecracker_Flowerpot.jpg', imageAlt: 'Flowerpot firework fountain in use', creator: 'Swetha01', source: 'https://commons.wikimedia.org/wiki/File:Firecracker_Flowerpot.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', galleryImages: ['https://upload.wikimedia.org/wikipedia/commons/e/e8/Fireworks_a_fountain_2.jpg', 'https://upload.wikimedia.org/wikipedia/commons/2/27/Fireworks_a_fountain_3.jpg'], galleryAttributions: [{ creator: 'Peter van der Sluijs', source: 'https://commons.wikimedia.org/wiki/File:Fireworks_a_fountain_2.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' }, { creator: 'Peter van der Sluijs', source: 'https://commons.wikimedia.org/wiki/File:Fireworks_a_fountain_3.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' }], video: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Fireworks_in_Paris%2C_July_14.ogv', videoCreator: 'Gunnar Larsson', videoSource: 'https://commons.wikimedia.org/wiki/File:Fireworks_in_Paris,_July_14.ogv', videoLicense: 'CC BY-SA 3.0', videoLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' },
+  { id: 'phuljhari', name: 'Phuljhari sparklers', kind: 'Hand-held sparkler', pack: '10-piece pack', price: 249, stock: 0, inventorySet: false, image: 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Fireworks_Sparklers_Diwali_India.jpg', imageAlt: 'Sparklers being enjoyed during Diwali in India', creator: 'Sean Ellis', source: 'https://commons.wikimedia.org/wiki/File:Fireworks_Sparklers_Diwali_India.jpg', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/', galleryImages: ['https://upload.wikimedia.org/wikipedia/commons/a/ab/Sparklers_at_DLF_City_Phase_2%2C_K_Block%2C_Gurgaon_during_Diwali_2.jpg', 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Sparklers_at_DLF_City_Phase_2%2C_K_Block%2C_Gurgaon_during_Diwali.jpg'], galleryAttributions: [{ creator: 'Slyronit', source: 'https://commons.wikimedia.org/wiki/File:Sparklers_at_DLF_City_Phase_2,_K_Block,_Gurgaon_during_Diwali_2.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' }, { creator: 'Slyronit', source: 'https://commons.wikimedia.org/wiki/File:Sparklers_at_DLF_City_Phase_2,_K_Block,_Gurgaon_during_Diwali.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' }], video: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Fireworks_in_Toyota%2C_Aichi%2C_Japan_2009.ogv', videoCreator: 'Emran Kassim', videoSource: 'https://commons.wikimedia.org/wiki/File:Fireworks_in_Toyota,_Aichi,_Japan_2009.ogv', videoLicense: 'CC BY 2.0', videoLicenseUrl: 'https://creativecommons.org/licenses/by/2.0/' },
+  { id: 'chakri', name: 'Chakri celebration set', kind: 'Spinning ground firework', pack: '5-piece pack', price: 799, stock: 0, inventorySet: false, image: 'https://upload.wikimedia.org/wikipedia/commons/0/02/Spinning_Fire.jpg?download=1', imageAlt: 'A spinning chakri firework in use in West Bengal', creator: 'Dey.sandip', source: 'https://commons.wikimedia.org/wiki/File:Spinning_Fire.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/', galleryImages: ['https://upload.wikimedia.org/wikipedia/commons/3/39/Different_colors_fireworks.jpg', 'https://upload.wikimedia.org/wikipedia/commons/0/03/Vuurwerk_draaizonnetje.JPG'], galleryAttributions: [{ creator: 'Peter van der Sluijs', source: 'https://commons.wikimedia.org/wiki/File:Different_colors_fireworks.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' }, { creator: 'Peter van der Sluijs', source: 'https://commons.wikimedia.org/wiki/File:Vuurwerk_draaizonnetje.JPG', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' }], video: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Bentenjima_Fireworks_01.ogv', videoCreator: 'kagely', videoSource: 'https://commons.wikimedia.org/wiki/File:Bentenjima_Fireworks_01.ogv', videoLicense: 'CC BY-SA 2.1 JP', videoLicenseUrl: 'https://creativecommons.org/licenses/by-sa/2.1/jp/deed.en' },
 ]
 const productsKey = 'sparkAndCoProducts'
 const wishlistKey = 'sparkAndCoWishlist'
@@ -161,8 +163,23 @@ const analyticsKey = 'sparkAndCoAnalytics'
 const safeRead = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback } catch { return fallback }
 }
+function withSeedMedia(product) {
+  const seed = seedProducts.find((entry) => entry.id === product.id)
+  if (!seed) return product
+  return {
+    ...product,
+    guideAnimation: product.guideAnimation ?? true,
+    galleryImages: product.galleryImages ?? seed.galleryImages,
+    galleryAttributions: product.galleryAttributions ?? seed.galleryAttributions,
+    video: product.video ?? seed.video,
+    videoCreator: product.videoCreator ?? seed.videoCreator,
+    videoSource: product.videoSource ?? seed.videoSource,
+    videoLicense: product.videoLicense ?? seed.videoLicense,
+    videoLicenseUrl: product.videoLicenseUrl ?? seed.videoLicenseUrl,
+  }
+}
 const storedProducts = import.meta.env.DEV ? safeRead(productsKey, null) : null
-let products = Array.isArray(storedProducts) ? storedProducts.filter((product) => product && product.id && product.name && Number.isFinite(Number(product.price)) && product.image).map((product) => ({ ...product, stock: Number.isInteger(product.stock) ? product.stock : 0, inventorySet: typeof product.inventorySet === 'boolean' ? product.inventorySet : Number.isInteger(product.stock) })) : [...seedProducts]
+let products = Array.isArray(storedProducts) ? storedProducts.filter((product) => product && product.id && product.name && Number.isFinite(Number(product.price)) && product.image).map((product) => ({ ...withSeedMedia(product), stock: Number.isInteger(product.stock) ? product.stock : 0, inventorySet: typeof product.inventorySet === 'boolean' ? product.inventorySet : Number.isInteger(product.stock) })) : seedProducts.map(withSeedMedia)
 let wishlist = safeRead(wishlistKey, []).filter((item) => products.some((product) => product.id === item.id))
 const formatPrice = (price) => `₹${price.toLocaleString('en-IN')}`
 const saveWishlist = () => localStorage.setItem(wishlistKey, JSON.stringify(wishlist))
@@ -255,17 +272,27 @@ document.querySelector('#category-chips').addEventListener('click', (event) => {
   renderProducts()
 })
 
-function photoCreditHtml(product) {
-  const sourceUrl = safeWebUrl(product.source)
-  const licenseUrl = safeWebUrl(product.licenseUrl)
-  const photoCredit = product.creator ? `Photo: ${escapeHtml(product.creator)}` : 'Seller-provided image'
+function photoCreditHtml(product, galleryIndex = 0) {
+  const attribution = galleryIndex > 0 ? product.galleryAttributions?.[galleryIndex - 1] : product
+  const sourceUrl = safeWebUrl(attribution?.source)
+  const licenseUrl = safeWebUrl(attribution?.licenseUrl)
+  const photoCredit = attribution?.creator ? `Photo: ${escapeHtml(attribution.creator)}` : 'Seller-provided image'
   const creditLink = sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${photoCredit}</a>` : photoCredit
-  const licenseLink = product.license && licenseUrl ? ` · <a href="${escapeHtml(licenseUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(product.license)}</a>` : ''
+  const licenseLink = attribution?.license && licenseUrl ? ` · <a href="${escapeHtml(licenseUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(attribution.license)}</a>` : ''
+  return `${creditLink}${licenseLink}`
+}
+
+function videoCreditHtml(product) {
+  const sourceUrl = safeWebUrl(product.videoSource)
+  const licenseUrl = safeWebUrl(product.videoLicenseUrl)
+  const creator = product.videoCreator ? escapeHtml(product.videoCreator) : 'Video source'
+  const creditLink = sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${creator}</a>` : creator
+  const licenseLink = product.videoLicense && licenseUrl ? ` · <a href="${escapeHtml(licenseUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(product.videoLicense)}</a>` : ''
   return `${creditLink}${licenseLink}`
 }
 
 function stockText(product) {
-  if (!product.inventorySet) return 'Inventory not set'
+  if (!product.inventorySet) return 'Availability unconfirmed'
   if (product.stock === 0) return 'Out of stock'
   return `${product.stock} ${product.stock === 1 ? 'pack' : 'packs'} available`
 }
@@ -287,9 +314,9 @@ function renderProducts() {
         <div class="product-photo"><img src="${escapeHtml(safeImageUrl(product.image))}" alt="${escapeHtml(product.imageAlt || product.name)}" loading="lazy"><span class="approval-tag">Illustrative listing</span></div>
         <div class="photo-credit">${photoCreditHtml(product)}</div>
         <div class="product-info"><div><span class="product-number">${String(index + 1).padStart(2, '0')} · ${escapeHtml(product.kind)}</span><h3><button type="button" class="product-open" data-open-product="${escapeHtml(product.id)}">${escapeHtml(product.name)}</button></h3></div><div class="product-actions" data-product-controls="${escapeHtml(product.id)}"></div></div>
-        <div class="product-details"><span>${escapeHtml(product.pack)}<small class="stock-count ${product.inventorySet && product.stock === 0 ? 'stock-out' : ''}">${!product.inventorySet ? ' · Inventory not set' : product.stock === 0 ? ' · Out of stock' : ` · ${product.stock} ${product.stock === 1 ? 'pack' : 'packs'} available`}</small></span><strong>${formatPrice(Number(product.price))} <small>indicative</small></strong></div>
+        <div class="product-details"><span>${escapeHtml(product.pack)}<small class="stock-count ${product.inventorySet && product.stock === 0 ? 'stock-out' : ''}">${!product.inventorySet ? ' · Availability unconfirmed' : product.stock === 0 ? ' · Out of stock' : ` · ${product.stock} ${product.stock === 1 ? 'pack' : 'packs'} available`}</small></span><strong>${formatPrice(Number(product.price))} <small>indicative</small></strong></div>
         <p class="product-description">${escapeHtml(product.description || defaultDescription)}</p>
-        ${videoUrl ? `<a class="product-video" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch product video <span aria-hidden="true">↗</span></a>` : ''}
+        ${videoUrl && !product.guideAnimation ? `<a class="product-video" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch product video <span aria-hidden="true">↗</span></a>` : ''}
       </article>
     `
   }).join('') : '<p class="catalog-empty">No products match. Try another search or category.</p>'
@@ -339,8 +366,8 @@ function renderProductControls() {
     const quantity = wishlist.find((item) => item.id === productId)?.quantity || 0
     const stock = Number(product.stock) || 0
     container.innerHTML = quantity
-      ? `<div class="quantity-stepper" aria-label="${escapeHtml(product.name)} quantity"><button type="button" data-quantity-change="-1" data-product-id="${escapeHtml(productId)}" aria-label="Remove one ${escapeHtml(product.name)}">−</button><output aria-live="polite">${quantity}</output><button type="button" data-quantity-change="1" data-product-id="${escapeHtml(productId)}" aria-label="Add one ${escapeHtml(product.name)}" ${quantity >= stock ? 'disabled' : ''}>+</button></div>`
-      : `<button class="wishlist-add" type="button" data-quantity-change="1" data-product-id="${escapeHtml(productId)}" aria-label="Add ${escapeHtml(product.name)} to wishlist" ${!product.inventorySet || stock === 0 ? 'disabled' : ''}>${!product.inventorySet ? 'Stock not set' : stock === 0 ? 'Out of stock' : 'Add'} ${product.inventorySet && stock > 0 ? '<span aria-hidden="true">+</span>' : ''}</button>`
+      ? `<div class="quantity-stepper" aria-label="${escapeHtml(product.name)} quantity"><button type="button" data-quantity-change="-1" data-product-id="${escapeHtml(productId)}" aria-label="Remove one ${escapeHtml(product.name)}">−</button><output aria-live="polite">${quantity}</output><button type="button" data-quantity-change="1" data-product-id="${escapeHtml(productId)}" aria-label="Add one ${escapeHtml(product.name)}" ${product.inventorySet && quantity >= stock ? 'disabled' : ''}>+</button></div>`
+      : `<button class="wishlist-add" type="button" data-quantity-change="1" data-product-id="${escapeHtml(productId)}" aria-label="Add ${escapeHtml(product.name)} to wishlist" ${product.inventorySet && stock === 0 ? 'disabled' : ''}>${product.inventorySet && stock === 0 ? 'Out of stock' : 'Add'} ${!product.inventorySet || stock > 0 ? '<span aria-hidden="true">+</span>' : ''}</button>`
   })
 }
 
@@ -349,7 +376,7 @@ function changeProductQuantity(productId, change) {
   const product = products.find((item) => item.id === productId)
   if (!product) return
   const nextQuantity = (existing?.quantity || 0) + change
-  if (change > 0 && (!product.inventorySet || nextQuantity > (Number(product.stock) || 0))) return
+  if (change > 0 && product.inventorySet && nextQuantity > (Number(product.stock) || 0)) return
   wishlist = nextQuantity > 0
     ? existing
       ? wishlist.map((item) => item.id === productId ? { ...item, quantity: nextQuantity } : item)
@@ -377,17 +404,18 @@ function renderWishlist() {
   const previousWishlist = JSON.stringify(wishlist)
   wishlist = wishlist.flatMap((item) => {
     const product = products.find((entry) => entry.id === item.id)
-    const quantity = Math.min(item.quantity, Number(product?.stock) || 0)
+    if (!product) return []
+    const quantity = product.inventorySet ? Math.min(item.quantity, Number(product.stock) || 0) : item.quantity
     return quantity > 0 ? [{ ...item, quantity }] : []
   })
   if (JSON.stringify(wishlist) !== previousWishlist) saveWishlist()
   const itemCount = wishlist.reduce((total, item) => total + item.quantity, 0)
   const itemRows = wishlist.map((item) => {
     const product = products.find((entry) => entry.id === item.id)
-    return `<li><span><strong>${product.name}</strong><small>${product.pack} · ${formatPrice(product.price)} each</small></span><label class="wishlist-quantity">Qty<input type="number" min="1" max="${product.stock}" step="1" value="${item.quantity}" data-quantity="${item.id}" aria-label="Quantity of ${product.name}"></label><strong>${formatPrice(product.price * item.quantity)}</strong><button class="wishlist-remove" type="button" data-remove="${item.id}" aria-label="Remove ${product.name}">×</button></li>`
+    return `<li><span><strong>${product.name}</strong><small>${product.pack} · ${formatPrice(product.price)} each</small></span><label class="wishlist-quantity">Qty<input type="number" min="1" ${product.inventorySet ? `max="${product.stock}"` : ''} step="1" value="${item.quantity}" data-quantity="${item.id}" aria-label="Quantity of ${product.name}"></label><strong>${formatPrice(product.price * item.quantity)}</strong><button class="wishlist-remove" type="button" data-remove="${item.id}" aria-label="Remove ${product.name}">×</button></li>`
   }).join('')
   const total = wishlist.reduce((sum, item) => sum + products.find((product) => product.id === item.id).price * item.quantity, 0)
-  panel.innerHTML = `<div class="wishlist-heading"><div><p class="eyebrow">YOUR SHORTLIST · ${itemCount} ${itemCount === 1 ? 'PACK' : 'PACKS'}</p><h3>Wishlist</h3></div><button class="clear-wishlist" type="button" ${wishlist.length ? '' : 'disabled'}>Clear</button></div>${wishlist.length ? `<ul class="wishlist-items">${itemRows}</ul><div class="wishlist-total"><span>Indicative total</span><strong>${formatPrice(total)}</strong></div>` : '<p class="wishlist-empty">Your wishlist is empty. Add a product to start an enquiry.</p>'}<p class="wishlist-disclaimer">Prices are examples only. The seller must confirm the final quote and legal availability.</p><a class="button button-whatsapp ${wishlist.length ? '' : 'is-disabled'}" href="#enquire" ${wishlist.length ? '' : 'aria-disabled="true"'}>Enquire on WhatsApp <span aria-hidden="true">↗</span></a>`
+  panel.innerHTML = `<div class="wishlist-heading"><div><p class="eyebrow">YOUR SHORTLIST · ${itemCount} ${itemCount === 1 ? 'PACK' : 'PACKS'}</p><h3>Wishlist</h3></div><button class="clear-wishlist" type="button" ${wishlist.length ? '' : 'disabled'}>Clear</button></div>${wishlist.length ? `<ul class="wishlist-items">${itemRows}</ul><div class="wishlist-total"><span>Indicative total</span><strong>${formatPrice(total)}</strong></div>` : '<p class="wishlist-empty">Your wishlist is empty. Add a product to start an enquiry.</p>'}<p class="wishlist-disclaimer">Prices and stock are unconfirmed until the seller verifies them. Wishlist quantities are enquiries, not reservations.</p><a class="button button-whatsapp ${wishlist.length ? '' : 'is-disabled'}" href="#enquire" ${wishlist.length ? '' : 'aria-disabled="true"'}>Enquire on WhatsApp <span aria-hidden="true">↗</span></a>`
   panel.querySelectorAll('[data-remove]').forEach((button) => button.addEventListener('click', () => {
     wishlist = wishlist.filter((item) => item.id !== button.dataset.remove)
     saveWishlist()
@@ -395,7 +423,8 @@ function renderWishlist() {
   }))
   panel.querySelectorAll('[data-quantity]').forEach((input) => input.addEventListener('change', () => {
     const product = products.find((entry) => entry.id === input.dataset.quantity)
-    const quantity = Math.min(Number(product.stock) || 0, Math.max(1, Number.parseInt(input.value, 10) || 1))
+    const requestedQuantity = Math.max(1, Number.parseInt(input.value, 10) || 1)
+    const quantity = product.inventorySet ? Math.min(Number(product.stock) || 0, requestedQuantity) : requestedQuantity
     wishlist = wishlist.map((item) => item.id === input.dataset.quantity ? { ...item, quantity } : item)
     saveWishlist()
     renderWishlist()
@@ -425,7 +454,7 @@ function renderBasketSheet(total) {
   const items = document.querySelector('#basket-sheet-items')
   items.innerHTML = wishlist.length ? wishlist.map((item) => {
     const product = products.find((entry) => entry.id === item.id)
-    return `<article class="basket-sheet-item"><img src="${escapeHtml(safeImageUrl(product.image))}" alt=""><div class="basket-sheet-product"><strong>${escapeHtml(product.name)}</strong><small>${escapeHtml(product.pack)}</small><span>${formatPrice(product.price)} each</span></div><div class="quantity-stepper" aria-label="${escapeHtml(product.name)} quantity"><button type="button" data-quantity-change="-1" data-product-id="${escapeHtml(product.id)}" aria-label="Remove one ${escapeHtml(product.name)}">−</button><output>${item.quantity}</output><button type="button" data-quantity-change="1" data-product-id="${escapeHtml(product.id)}" aria-label="Add one ${escapeHtml(product.name)}" ${item.quantity >= Number(product.stock) ? 'disabled' : ''}>+</button></div></article>`
+    return `<article class="basket-sheet-item"><img src="${escapeHtml(safeImageUrl(product.image))}" alt=""><div class="basket-sheet-product"><strong>${escapeHtml(product.name)}</strong><small>${escapeHtml(product.pack)}</small><span>${formatPrice(product.price)} each</span></div><div class="quantity-stepper" aria-label="${escapeHtml(product.name)} quantity"><button type="button" data-quantity-change="-1" data-product-id="${escapeHtml(product.id)}" aria-label="Remove one ${escapeHtml(product.name)}">−</button><output>${item.quantity}</output><button type="button" data-quantity-change="1" data-product-id="${escapeHtml(product.id)}" aria-label="Add one ${escapeHtml(product.name)}" ${product.inventorySet && item.quantity >= Number(product.stock) ? 'disabled' : ''}>+</button></div></article>`
   }).join('') : '<p class="catalog-empty">Your basket is empty.</p>'
   document.querySelector('#basket-sheet-total').textContent = formatPrice(total)
 }
@@ -474,7 +503,130 @@ let productSheetOpener = null
 
 function youtubeVideo(url) {
   const match = String(url || '').match(/(?:youtube\.com\/(shorts\/|watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/)
-  return match ? { id: match[2], vertical: match[1] === 'shorts/' } : null
+  return match ? { id: match[2] } : null
+}
+
+function directVideo(url) {
+  try { return /\.(mp4|webm|ogg|ogv)$/i.test(new URL(url).pathname) } catch { return false }
+}
+
+function productGuideHtml(product) {
+  const details = `${product.name} ${product.kind}`.toLowerCase()
+  const guideType = /sparkler|phuljhari/.test(details) ? 'sparkler' : /chakri|spinning|spinner|wheel/.test(details) ? 'spinner' : 'fountain'
+  const steps = guideType === 'sparkler'
+    ? ['Use outdoors, away from people and clothing', 'An adult lights one at a time', 'Hold by the wire handle, arm outstretched', 'Soak the spent wire; do not hand it off hot']
+    : guideType === 'spinner'
+      ? ['Check local rules and read the product label', 'Place flat on open, bare, level ground', 'An adult lights as labeled, then steps away', 'Never hold it or relight a dud']
+      : ['Check local rules and read the product label', 'Set upright on open, bare, level ground', 'An adult lights as labeled, then steps away', 'Let it finish; never relight a dud']
+  const operator = guideType === 'sparkler'
+    ? '<g class="guide-operator guide-operator-still"><circle cx="115" cy="169" r="17" fill="#f2cd5b"/><path d="M115 190v61m0-42 58-21m-58 26-25 35m25 2-21 43m21-43 27 42" fill="none" stroke="#f8f6f0" stroke-linecap="round" stroke-width="12"/><path d="m173 188 39-56" fill="none" stroke="#d9ddd6" stroke-linecap="round" stroke-width="5"/><path d="m205 142 9-14" stroke="#ee634d" stroke-linecap="round" stroke-width="8"/></g>'
+    : '<g class="guide-operator"><circle cx="104" cy="171" r="17" fill="#f2cd5b"/><path d="M104 192v62m0-40 43 24m-43-18-27 38m27-4-23 43m23-43 28 42" fill="none" stroke="#f8f6f0" stroke-linecap="round" stroke-width="12"/></g>'
+  const productArt = guideType === 'sparkler'
+    ? '<g class="guide-sparkler"><path d="m211 132 40-58" stroke="#d9ddd6" stroke-linecap="round" stroke-width="5"/><path d="m247 81 8-14" stroke="#ee634d" stroke-linecap="round" stroke-width="8"/></g><g class="guide-effects"><path d="m254 48 3-19m12 26 15-12m-8 25 20-2m-41-1-17-15m38 28 18 12m-46-29-20 1" stroke="#f2cd5b" stroke-linecap="round" stroke-width="4"/><circle cx="256" cy="59" r="17" fill="#f2cd5b" opacity=".26"/></g>'
+    : guideType === 'spinner'
+      ? '<g class="guide-spinner"><circle cx="315" cy="283" r="27" fill="#ee634d" stroke="#f2cd5b" stroke-width="5"/><circle cx="315" cy="283" r="7" fill="#f8f6f0"/><path d="M315 258v50m-25-25h50m-42-18 35 36m0-36-35 36" stroke="#f8f6f0" stroke-width="3"/></g><g class="guide-effects"><path d="m315 242 1-24m24 32 19-15m-12 39 24-1m-47 27 2 22m-26-42-21 12m19-34-21-13" stroke="#f2cd5b" stroke-linecap="round" stroke-width="5"/><circle cx="315" cy="282" r="48" fill="none" stroke="#ee634d" stroke-width="3"/></g>'
+      : '<g class="guide-fountain"><rect x="286" y="226" width="58" height="72" rx="8" fill="#ee634d"/><rect x="286" y="237" width="58" height="9" fill="#f2cd5b"/><path d="M315 225q9-12 0-21" fill="none" stroke="#d9ddd6" stroke-linecap="round" stroke-width="4"/><text x="315" y="274" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">FOUNTAIN</text></g><g class="guide-effects"><path d="M315 209v-73m-12 73-21-60m33 60 22-60m-43 60-42-42m64 42 42-42m-69 42-10-45m45 45 10-45" stroke="#f2cd5b" stroke-linecap="round" stroke-width="5"/><path d="M315 205v-91" stroke="#ee634d" stroke-linecap="round" stroke-width="3"/></g>'
+  return `<div class="product-guide" data-product-guide data-guide-type="${guideType}" data-guide-steps="${escapeHtml(JSON.stringify(steps))}">
+    <div class="guide-heading"><span>SAFE-USE ANIMATION</span><strong>${escapeHtml(product.name)}</strong></div>
+    <svg class="guide-art" viewBox="0 0 480 360" role="img" aria-label="Illustration of safe ${escapeHtml(product.kind.toLowerCase())} use">
+      <defs><linearGradient id="guide-sky-${guideType}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18353b"/><stop offset="1" stop-color="#32585b"/></linearGradient></defs>
+      <rect width="480" height="360" fill="url(#guide-sky-${guideType})"/>
+      <circle cx="54" cy="51" r="2" fill="#f8f6f0"/><circle cx="402" cy="67" r="2" fill="#f2cd5b"/><circle cx="348" cy="38" r="1.5" fill="#f8f6f0"/>
+      <path d="M0 298q86-12 164 0t156 0 160 0v62H0z" fill="#10282d"/><path d="M0 298h480" stroke="#718083" stroke-width="2"/>
+      ${operator}${productArt}
+    </svg>
+    <p class="guide-caption" data-guide-caption aria-live="polite">${escapeHtml(steps[0])}</p>
+    <div class="guide-progress" aria-hidden="true">${steps.map((_, index) => `<span data-guide-step aria-current="${index === 0}"></span>`).join('')}</div>
+    <div class="guide-footer"><small>Illustrative only · Follow local rules and the product label</small><button class="guide-replay" type="button" data-guide-replay aria-label="Replay animation" title="Replay animation"><span aria-hidden="true">↻</span></button></div>
+  </div>`
+}
+
+let productGuideTimer = null
+
+function stopProductGuide(guide) {
+  if (productGuideTimer !== null) {
+    clearInterval(productGuideTimer)
+    productGuideTimer = null
+  }
+  guide?.classList.remove('is-playing')
+}
+
+function playProductGuide(guide) {
+  if (!guide) return
+  stopProductGuide()
+  const steps = JSON.parse(guide.dataset.guideSteps)
+  const caption = guide.querySelector('[data-guide-caption]')
+  const progressSteps = [...guide.querySelectorAll('[data-guide-step]')]
+  let step = 0
+  const showStep = () => {
+    caption.textContent = steps[step]
+    progressSteps.forEach((element, index) => element.setAttribute('aria-current', String(index === step)))
+  }
+  showStep()
+  if (reducedMotion.matches) return
+  guide.classList.remove('is-playing')
+  void guide.offsetWidth
+  guide.classList.add('is-playing')
+  productGuideTimer = setInterval(() => {
+    if (step === steps.length - 1) {
+      stopProductGuide(guide)
+      return
+    }
+    step += 1
+    showStep()
+  }, 2000)
+}
+
+function setProductGallerySlide(index) {
+  const track = productSheetBody.querySelector('[data-gallery-track]')
+  if (!track) return
+  const slides = [...track.querySelectorAll('[data-gallery-slide]')]
+  const selectedIndex = Math.max(0, Math.min(index, slides.length - 1))
+  const selectedSlide = slides[selectedIndex]
+  const isVideoSlide = selectedSlide.hasAttribute('data-video-slide')
+  const guide = selectedSlide.querySelector('[data-product-guide]')
+  const existingGuide = productSheetBody.querySelector('[data-product-guide]')
+  if (existingGuide) {
+    if (guide) playProductGuide(guide)
+    else stopProductGuide(existingGuide)
+  }
+  track.style.transform = `translateX(-${selectedIndex * 100}%)`
+  slides.forEach((slide, slideIndex) => {
+    const isSelected = slideIndex === selectedIndex
+    slide.setAttribute('aria-hidden', String(!isSelected))
+    slide.toggleAttribute('inert', !isSelected)
+  })
+  const galleryPosition = productSheetBody.querySelector('[data-gallery-position]')
+  galleryPosition.textContent = `${selectedIndex + 1} / ${slides.length}`
+  galleryPosition.classList.toggle('is-video-position', isVideoSlide)
+  productSheetBody.querySelector('[data-gallery-step="-1"]').disabled = selectedIndex === 0
+  productSheetBody.querySelector('[data-gallery-step="1"]').disabled = selectedIndex === slides.length - 1
+
+  const product = products.find((item) => item.id === productSheet.dataset.productId)
+  const credit = productSheetBody.querySelector('[data-photo-credit]')
+  credit.innerHTML = guide
+    ? 'Animated safety guide · Follow local rules and product label'
+    : isVideoSlide
+    ? `Representative clip · 8-second preview · muted · ${videoCreditHtml(product)}`
+    : photoCreditHtml(product, selectedIndex)
+
+  const video = productSheetBody.querySelector('[data-product-preview]')
+  if (video) {
+    if (isVideoSlide) {
+      if (video.readyState > 0) video.currentTime = 0
+      video.play().catch(() => {})
+    } else {
+      video.pause()
+      if (video.readyState > 0) video.currentTime = 0
+    }
+  }
+
+  const youtubeFrame = productSheetBody.querySelector('[data-youtube-player]')
+  if (youtubeFrame) {
+    youtubeFrame.src = isVideoSlide
+      ? `https://www.youtube-nocookie.com/embed/${youtubeFrame.dataset.youtubeId}?autoplay=1&mute=1&playsinline=1&rel=0&controls=1&start=0&end=8`
+      : 'about:blank'
+  }
 }
 
 function openProductSheet(productId) {
@@ -482,24 +634,41 @@ function openProductSheet(productId) {
   if (!product) return
   const videoUrl = safeWebUrl(product.video)
   const youtube = youtubeVideo(videoUrl)
+  const galleryImages = [product.image, ...(Array.isArray(product.galleryImages) ? product.galleryImages : [])]
+    .map(safeImageUrl)
+    .filter(Boolean)
+    .slice(0, 3)
+  const hasPlayableVideo = Boolean(product.guideAnimation || youtube || directVideo(videoUrl))
   productSheetBody.innerHTML = `
-    <div class="product-sheet-media">
-      <img src="${escapeHtml(safeImageUrl(product.image))}" alt="${escapeHtml(product.imageAlt || product.name)}">
-      <span class="approval-tag">Illustrative listing</span>
-      ${youtube ? `<button class="product-sheet-play" type="button" data-play-video="${youtube.id}" data-vertical="${youtube.vertical}" aria-label="Play ${escapeHtml(product.name)} video"><span aria-hidden="true">▶</span> Play video</button>` : ''}
+    <div class="product-sheet-media" role="region" aria-label="${escapeHtml(product.name)} product media">
+      <div class="product-gallery-track" data-gallery-track>
+        ${galleryImages.map((image, index) => `<div class="product-gallery-slide" data-gallery-slide aria-hidden="${index !== 0}" ${index !== 0 ? 'inert' : ''}><img src="${escapeHtml(image)}" alt="${escapeHtml(product.imageAlt || product.name)}${index ? `, photo ${index + 1}` : ''}"><span class="approval-tag">Illustrative listing</span></div>`).join('')}
+        ${product.guideAnimation ? `<div class="product-gallery-slide product-gallery-slide-video" data-gallery-slide data-video-slide aria-hidden="true" inert>${productGuideHtml(product)}</div>` : youtube ? `<div class="product-gallery-slide product-gallery-slide-video" data-gallery-slide data-video-slide aria-hidden="true" inert><iframe data-youtube-player data-youtube-id="${youtube.id}" src="about:blank" title="8-second product video preview" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>` : directVideo(videoUrl) ? `<div class="product-gallery-slide product-gallery-slide-video" data-gallery-slide data-video-slide aria-hidden="true" inert><video src="${escapeHtml(videoUrl)}" poster="${escapeHtml(galleryImages[0] || '')}" controls muted playsinline preload="metadata" data-product-preview></video></div>` : ''}
+      </div>
+      <button class="product-gallery-nav" type="button" data-gallery-step="-1" aria-label="Previous media" disabled><span aria-hidden="true">&larr;</span></button>
+      <button class="product-gallery-nav" type="button" data-gallery-step="1" aria-label="Next media" ${galleryImages.length + Number(hasPlayableVideo) <= 1 ? 'disabled' : ''}><span aria-hidden="true">&rarr;</span></button>
+      <span class="product-gallery-position" data-gallery-position aria-live="polite">1 / ${galleryImages.length + Number(hasPlayableVideo)}</span>
     </div>
     <div class="product-sheet-content">
       <p class="eyebrow">${escapeHtml(product.kind)}</p>
       <h2 id="product-sheet-title">${escapeHtml(product.name)}</h2>
       <p class="product-sheet-meta"><span>${escapeHtml(product.pack)}</span><span class="stock-count ${product.inventorySet && product.stock === 0 ? 'stock-out' : ''}">${stockText(product)}</span></p>
       <p class="product-sheet-description">${escapeHtml(product.description || defaultDescription)}</p>
-      ${videoUrl && !youtube ? `<a class="product-video" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch product video <span aria-hidden="true">↗</span></a>` : ''}
-      <div class="photo-credit">${photoCreditHtml(product)}</div>
+      ${videoUrl && !product.guideAnimation && !youtube && !directVideo(videoUrl) ? `<a class="product-video" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch product video <span aria-hidden="true">↗</span></a>` : ''}
+      <div class="photo-credit" data-photo-credit>${photoCreditHtml(product)}</div>
     </div>
     <div class="product-sheet-footer">
       <p class="product-sheet-price"><strong>${formatPrice(Number(product.price))}</strong><small>indicative</small></p>
       <div class="product-actions" data-product-controls="${escapeHtml(product.id)}"></div>
     </div>`
+  productSheet.dataset.productId = productId
+  const previewVideo = productSheetBody.querySelector('[data-product-preview]')
+  previewVideo?.addEventListener('timeupdate', () => {
+    if (Number.isFinite(previewVideo.duration) && previewVideo.currentTime >= Math.min(8, previewVideo.duration)) {
+      previewVideo.pause()
+      previewVideo.currentTime = Math.min(8, previewVideo.duration)
+    }
+  })
   renderProductControls()
   recordProductClick(productId)
   productSheetOpener = document.activeElement
@@ -509,6 +678,7 @@ function openProductSheet(productId) {
   productSheet.style.opacity = ''
   productSheet.dataset.dragY = '0'
   productSheet.showModal()
+  setProductGallerySlide(0)
   productSheetPanel.scrollTop = 0
   document.documentElement.classList.add('sheet-lock')
   // Let the phone's back button close the sheet instead of leaving the page.
@@ -532,6 +702,7 @@ productSheet.addEventListener('close', () => {
   productSheet.style.transform = ''
   productSheet.style.opacity = ''
   productSheet.dataset.dragY = '0'
+  stopProductGuide(productSheetBody.querySelector('[data-product-guide]'))
   productSheetBody.innerHTML = '' // also stops a playing video
   document.documentElement.classList.remove('sheet-lock')
   if (productSheetInHistory) {
@@ -555,15 +726,13 @@ window.addEventListener('popstate', () => {
 
 productSheet.addEventListener('click', (event) => {
   if (event.target === productSheet) return closeProductSheet() // tap on the dimmed backdrop
+  const replay = event.target.closest('[data-guide-replay]')
+  if (replay) return playProductGuide(replay.closest('[data-product-guide]'))
+  const galleryButton = event.target.closest('[data-gallery-step]')
+  if (galleryButton) return setProductGallerySlide(Number(productSheetBody.querySelector('[data-gallery-position]').textContent.split(' / ')[0]) - 1 + Number(galleryButton.dataset.galleryStep))
   const control = event.target.closest('[data-quantity-change]')
   if (control) return changeProductQuantity(control.dataset.productId, Number(control.dataset.quantityChange))
   if (event.target.closest('[data-product-sheet-close]')) return closeProductSheet()
-  const play = event.target.closest('[data-play-video]')
-  if (play) {
-    const media = play.closest('.product-sheet-media')
-    media.classList.add('is-playing', play.dataset.vertical === 'true' ? 'is-vertical' : 'is-wide')
-    media.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${play.dataset.playVideo}?autoplay=1&playsinline=1&rel=0" title="Product video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`
-  }
 })
 
 // Drag the sheet down to dismiss. It follows the finger, then closes if pulled
@@ -874,8 +1043,10 @@ document.querySelector('#admin-product-list').addEventListener('click', async (e
     stockInput.required = stockConfirmed.checked
     stockInput.value = stockConfirmed.checked ? product.stock : ''
     document.querySelector('#admin-image-url').value = product.image.startsWith('data:image/') ? '' : product.image
+    document.querySelector('#admin-gallery-image-2').value = product.galleryImages?.[0] || ''
+    document.querySelector('#admin-gallery-image-3').value = product.galleryImages?.[1] || ''
     document.querySelector('#admin-creator').value = product.creator || ''
-    document.querySelector('#admin-video-url').value = product.video || ''
+    document.querySelector('#admin-video-url').value = product.guideAnimation ? '' : product.video || ''
     document.querySelector('#admin-description').value = product.description || ''
     uploadedImage = product.image.startsWith('data:image/') ? product.image : ''
     previewProductImage(product.image)
@@ -929,6 +1100,7 @@ productForm.addEventListener('submit', async (event) => {
   const existing = products.find((product) => product.id === values.id)
   const image = uploadedImage || values.image.trim() || existing?.image || ''
   const cleanImage = safeImageUrl(image)
+  const galleryImages = [values.galleryImage2.trim(), values.galleryImage3.trim()].filter(Boolean).map(safeImageUrl)
   const video = values.video.trim() ? safeWebUrl(values.video.trim()) : ''
   if (!cleanImage) {
     adminStatus.textContent = 'Add a valid HTTPS image URL or upload an image.'
@@ -936,6 +1108,14 @@ productForm.addEventListener('submit', async (event) => {
   }
   if (values.video.trim() && !video) {
     adminStatus.textContent = 'Video links must use HTTPS.'
+    return
+  }
+  if (video && !youtubeVideo(video) && !directVideo(video) && video !== existing?.video) {
+    adminStatus.textContent = 'Use a YouTube link or direct MP4, WebM, OGG, or OGV video URL.'
+    return
+  }
+  if (galleryImages.some((imageUrl) => !imageUrl)) {
+    adminStatus.textContent = 'Additional photo links must be valid HTTPS image URLs.'
     return
   }
   const product = {
@@ -947,9 +1127,19 @@ productForm.addEventListener('submit', async (event) => {
     stock: stockConfirmed.checked ? Number(values.stock) : 0,
     inventorySet: stockConfirmed.checked,
     image: cleanImage,
+    galleryImages,
+    galleryAttributions: galleryImages.map((imageUrl) => {
+      const imageIndex = existing?.galleryImages?.indexOf(imageUrl) ?? -1
+      return imageIndex >= 0 ? existing.galleryAttributions?.[imageIndex] || null : null
+    }),
     imageAlt: values.name.trim(),
     creator: values.creator.trim() || (cleanImage === existing?.image ? existing.creator || '' : ''),
     video,
+    guideAnimation: values.video.trim() ? false : existing?.guideAnimation ?? true,
+    videoCreator: video === existing?.video ? existing.videoCreator || '' : '',
+    videoSource: video === existing?.video ? existing.videoSource || '' : '',
+    videoLicense: video === existing?.video ? existing.videoLicense || '' : '',
+    videoLicenseUrl: video === existing?.video ? existing.videoLicenseUrl || '' : '',
     description: values.description.trim(),
   }
   const photoChanged = Boolean(existing && cleanImage !== existing.image)
@@ -971,7 +1161,7 @@ async function loadSharedCatalog() {
     if (!response.ok) return
     const result = await response.json()
     if (!Array.isArray(result.products)) return
-    products = result.products.map((product) => ({ ...product, stock: Number.isInteger(product.stock) ? product.stock : 0, inventorySet: typeof product.inventorySet === 'boolean' ? product.inventorySet : Number.isInteger(product.stock) }))
+    products = result.products.map((product) => ({ ...withSeedMedia(product), stock: Number.isInteger(product.stock) ? product.stock : 0, inventorySet: typeof product.inventorySet === 'boolean' ? product.inventorySet : Number.isInteger(product.stock) }))
     wishlist = wishlist.filter((item) => products.some((product) => product.id === item.id))
     saveWishlist()
     renderProducts()
