@@ -123,6 +123,13 @@ document.querySelector('#app').innerHTML = `
     <div class="basket-sheet-items" id="basket-sheet-items"></div>
     <div class="basket-sheet-footer"><p><span>Indicative total</span><strong id="basket-sheet-total">₹0</strong></p><button class="button basket-continue" id="sheet-continue" type="button">Continue to enquiry <span aria-hidden="true">→</span></button><small>Final prices, availability, and local permissions must be confirmed by the seller.</small></div>
   </dialog>
+  <dialog class="product-sheet" id="product-sheet" aria-labelledby="product-sheet-title">
+    <button class="product-sheet-close" type="button" data-product-sheet-close aria-label="Close product details">×</button>
+    <div class="product-sheet-panel" id="product-sheet-panel">
+      <div class="product-sheet-handle" aria-hidden="true"><span></span></div>
+      <div id="product-sheet-body"></div>
+    </div>
+  </dialog>
 `
 
 const menuToggle = document.querySelector('.menu-toggle')
@@ -248,6 +255,23 @@ document.querySelector('#category-chips').addEventListener('click', (event) => {
   renderProducts()
 })
 
+function photoCreditHtml(product) {
+  const sourceUrl = safeWebUrl(product.source)
+  const licenseUrl = safeWebUrl(product.licenseUrl)
+  const photoCredit = product.creator ? `Photo: ${escapeHtml(product.creator)}` : 'Seller-provided image'
+  const creditLink = sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${photoCredit}</a>` : photoCredit
+  const licenseLink = product.license && licenseUrl ? ` · <a href="${escapeHtml(licenseUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(product.license)}</a>` : ''
+  return `${creditLink}${licenseLink}`
+}
+
+function stockText(product) {
+  if (!product.inventorySet) return 'Inventory not set'
+  if (product.stock === 0) return 'Out of stock'
+  return `${product.stock} ${product.stock === 1 ? 'pack' : 'packs'} available`
+}
+
+const defaultDescription = 'Example listing only. Ask the seller to confirm exact contents, current product approvals, and availability in your area.'
+
 function renderProducts() {
   const query = searchInput.value.trim().toLowerCase()
   const visibleProducts = products.filter((product) => {
@@ -258,18 +282,13 @@ function renderProducts() {
   document.querySelector('#product-count').textContent = `${visibleProducts.length} ${visibleProducts.length === 1 ? 'product' : 'products'}`
   document.querySelector('#product-grid').innerHTML = visibleProducts.length ? visibleProducts.map((product, index) => {
     const videoUrl = safeWebUrl(product.video)
-    const sourceUrl = safeWebUrl(product.source)
-    const licenseUrl = safeWebUrl(product.licenseUrl)
-    const photoCredit = product.creator ? `Photo: ${escapeHtml(product.creator)}` : 'Seller-provided image'
-    const creditLink = sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">${photoCredit}</a>` : photoCredit
-    const licenseLink = product.license && licenseUrl ? ` · <a href="${escapeHtml(licenseUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(product.license)}</a>` : ''
     return `
-      <article class="product-card">
+      <article class="product-card" data-card="${escapeHtml(product.id)}">
         <div class="product-photo"><img src="${escapeHtml(safeImageUrl(product.image))}" alt="${escapeHtml(product.imageAlt || product.name)}" loading="lazy"><span class="approval-tag">Illustrative listing</span></div>
-        <div class="photo-credit">${creditLink}${licenseLink}</div>
-        <div class="product-info"><div><span class="product-number">${String(index + 1).padStart(2, '0')} · ${escapeHtml(product.kind)}</span><h3>${escapeHtml(product.name)}</h3></div><div class="product-actions" data-product-controls="${escapeHtml(product.id)}"></div></div>
+        <div class="photo-credit">${photoCreditHtml(product)}</div>
+        <div class="product-info"><div><span class="product-number">${String(index + 1).padStart(2, '0')} · ${escapeHtml(product.kind)}</span><h3><button type="button" class="product-open" data-open-product="${escapeHtml(product.id)}">${escapeHtml(product.name)}</button></h3></div><div class="product-actions" data-product-controls="${escapeHtml(product.id)}"></div></div>
         <div class="product-details"><span>${escapeHtml(product.pack)}<small class="stock-count ${product.inventorySet && product.stock === 0 ? 'stock-out' : ''}">${!product.inventorySet ? ' · Inventory not set' : product.stock === 0 ? ' · Out of stock' : ` · ${product.stock} ${product.stock === 1 ? 'pack' : 'packs'} available`}</small></span><strong>${formatPrice(Number(product.price))} <small>indicative</small></strong></div>
-        <p class="product-description">${escapeHtml(product.description || 'Example listing only. Ask the seller to confirm exact contents, current product approvals, and availability in your area.')}</p>
+        <p class="product-description">${escapeHtml(product.description || defaultDescription)}</p>
         ${videoUrl ? `<a class="product-video" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch product video <span aria-hidden="true">↗</span></a>` : ''}
       </article>
     `
@@ -343,7 +362,14 @@ function changeProductQuantity(productId, change) {
 
 document.querySelector('#product-grid').addEventListener('click', (event) => {
   const control = event.target.closest('[data-quantity-change]')
-  if (control) changeProductQuantity(control.dataset.productId, Number(control.dataset.quantityChange))
+  if (control) {
+    changeProductQuantity(control.dataset.productId, Number(control.dataset.quantityChange))
+    return
+  }
+  // Links (video, photo credit) and other buttons keep their own behaviour.
+  if (event.target.closest('a, input, button:not([data-open-product])')) return
+  const card = event.target.closest('.product-card[data-card]')
+  if (card) openProductSheet(card.dataset.card)
 })
 
 function renderWishlist() {
@@ -437,6 +463,185 @@ function enableSwipeSheet(dialog, handle, scrollArea) {
 }
 
 enableSwipeSheet(basketSheet, document.querySelector('#basket-sheet-handle'), document.querySelector('#basket-sheet-items'))
+
+/* ---------- Product details popup (tap a card, swipe down to close) ---------- */
+const productSheet = document.querySelector('#product-sheet')
+const productSheetBody = document.querySelector('#product-sheet-body')
+const productSheetPanel = document.querySelector('#product-sheet-panel')
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+let productSheetInHistory = false
+let productSheetOpener = null
+
+function youtubeVideo(url) {
+  const match = String(url || '').match(/(?:youtube\.com\/(shorts\/|watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/)
+  return match ? { id: match[2], vertical: match[1] === 'shorts/' } : null
+}
+
+function openProductSheet(productId) {
+  const product = products.find((item) => item.id === productId)
+  if (!product) return
+  const videoUrl = safeWebUrl(product.video)
+  const youtube = youtubeVideo(videoUrl)
+  productSheetBody.innerHTML = `
+    <div class="product-sheet-media">
+      <img src="${escapeHtml(safeImageUrl(product.image))}" alt="${escapeHtml(product.imageAlt || product.name)}">
+      <span class="approval-tag">Illustrative listing</span>
+      ${youtube ? `<button class="product-sheet-play" type="button" data-play-video="${youtube.id}" data-vertical="${youtube.vertical}" aria-label="Play ${escapeHtml(product.name)} video"><span aria-hidden="true">▶</span> Play video</button>` : ''}
+    </div>
+    <div class="product-sheet-content">
+      <p class="eyebrow">${escapeHtml(product.kind)}</p>
+      <h2 id="product-sheet-title">${escapeHtml(product.name)}</h2>
+      <p class="product-sheet-meta"><span>${escapeHtml(product.pack)}</span><span class="stock-count ${product.inventorySet && product.stock === 0 ? 'stock-out' : ''}">${stockText(product)}</span></p>
+      <p class="product-sheet-description">${escapeHtml(product.description || defaultDescription)}</p>
+      ${videoUrl && !youtube ? `<a class="product-video" href="${escapeHtml(videoUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch product video <span aria-hidden="true">↗</span></a>` : ''}
+      <div class="photo-credit">${photoCreditHtml(product)}</div>
+    </div>
+    <div class="product-sheet-footer">
+      <p class="product-sheet-price"><strong>${formatPrice(Number(product.price))}</strong><small>indicative</small></p>
+      <div class="product-actions" data-product-controls="${escapeHtml(product.id)}"></div>
+    </div>`
+  renderProductControls()
+  recordProductClick(productId)
+  productSheetOpener = document.activeElement
+  productSheet.classList.remove('is-closing')
+  productSheet.style.transition = ''
+  productSheet.style.transform = ''
+  productSheet.style.opacity = ''
+  productSheet.dataset.dragY = '0'
+  productSheet.showModal()
+  productSheetPanel.scrollTop = 0
+  document.documentElement.classList.add('sheet-lock')
+  // Let the phone's back button close the sheet instead of leaving the page.
+  history.pushState({ productSheet: true }, '')
+  productSheetInHistory = true
+}
+
+function closeProductSheet() {
+  if (!productSheet.open || productSheet.classList.contains('is-closing')) return
+  if (reducedMotion.matches) return productSheet.close()
+  productSheet.classList.add('is-closing')
+  productSheet.style.transition = 'transform .2s ease-in, opacity .2s ease-in'
+  productSheet.style.transform = `translateY(${Math.max(60, parseFloat(productSheet.dataset.dragY || 0) + 60)}px)`
+  productSheet.style.opacity = '0'
+  setTimeout(() => productSheet.close(), 220)
+}
+
+productSheet.addEventListener('close', () => {
+  productSheet.classList.remove('is-closing')
+  productSheet.style.transition = ''
+  productSheet.style.transform = ''
+  productSheet.style.opacity = ''
+  productSheet.dataset.dragY = '0'
+  productSheetBody.innerHTML = '' // also stops a playing video
+  document.documentElement.classList.remove('sheet-lock')
+  if (productSheetInHistory) {
+    productSheetInHistory = false
+    if (history.state?.productSheet) history.back()
+  }
+  if (productSheetOpener?.isConnected) productSheetOpener.focus({ preventScroll: true })
+})
+
+// Escape key: animate out instead of closing instantly.
+productSheet.addEventListener('cancel', (event) => {
+  event.preventDefault()
+  closeProductSheet()
+})
+
+window.addEventListener('popstate', () => {
+  if (!productSheet.open) return
+  productSheetInHistory = false
+  closeProductSheet()
+})
+
+productSheet.addEventListener('click', (event) => {
+  if (event.target === productSheet) return closeProductSheet() // tap on the dimmed backdrop
+  const control = event.target.closest('[data-quantity-change]')
+  if (control) return changeProductQuantity(control.dataset.productId, Number(control.dataset.quantityChange))
+  if (event.target.closest('[data-product-sheet-close]')) return closeProductSheet()
+  const play = event.target.closest('[data-play-video]')
+  if (play) {
+    const media = play.closest('.product-sheet-media')
+    media.classList.add('is-playing', play.dataset.vertical === 'true' ? 'is-vertical' : 'is-wide')
+    media.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${play.dataset.playVideo}?autoplay=1&playsinline=1&rel=0" title="Product video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`
+  }
+})
+
+// Drag the sheet down to dismiss. It follows the finger, then closes if pulled
+// far or flicked fast, otherwise it springs back.
+function enableDragToDismiss(sheet, scrollArea, onDismiss) {
+  let startY = 0
+  let lastY = 0
+  let startTime = 0
+  let tracking = false
+  let dragging = false
+
+  const begin = (y, target) => {
+    if (target.closest('button, a, input, textarea, iframe')) return false
+    tracking = true
+    dragging = false
+    startY = lastY = y
+    startTime = performance.now()
+    return true
+  }
+  const move = (y, event) => {
+    if (!tracking) return
+    const delta = y - startY
+    lastY = y
+    if (!dragging) {
+      if (delta > 8 && scrollArea.scrollTop <= 0) {
+        dragging = true
+        sheet.style.transition = 'none'
+      } else if (Math.abs(delta) > 8) {
+        tracking = false // normal scrolling inside the sheet
+        return
+      }
+    }
+    if (dragging) {
+      if (event.cancelable) event.preventDefault()
+      const offset = Math.max(0, delta)
+      sheet.dataset.dragY = String(offset)
+      sheet.style.transform = `translateY(${offset}px)`
+      sheet.style.opacity = String(1 - Math.min(offset / 500, 0.4))
+    }
+  }
+  const end = () => {
+    if (!tracking) return
+    tracking = false
+    if (!dragging) return
+    dragging = false
+    const delta = lastY - startY
+    const velocity = delta / Math.max(1, performance.now() - startTime)
+    if (delta > Math.min(140, scrollArea.offsetHeight * 0.25) || (delta > 40 && velocity > 0.6)) onDismiss()
+    else {
+      sheet.style.transition = 'transform .2s ease-out, opacity .2s ease-out'
+      sheet.style.transform = ''
+      sheet.style.opacity = ''
+      sheet.dataset.dragY = '0'
+    }
+  }
+
+  sheet.addEventListener('touchstart', (event) => {
+    if (event.touches.length === 1) begin(event.touches[0].clientY, event.target)
+  }, { passive: true })
+  sheet.addEventListener('touchmove', (event) => move(event.touches[0].clientY, event), { passive: false })
+  sheet.addEventListener('touchend', end)
+  sheet.addEventListener('touchcancel', end)
+
+  // Mouse drag, so it can be tested on a laptop too.
+  sheet.addEventListener('mousedown', (event) => {
+    if (event.button !== 0 || !begin(event.clientY, event.target)) return
+    const onMove = (moveEvent) => move(moveEvent.clientY, moveEvent)
+    const onUp = () => {
+      end()
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  })
+}
+
+enableDragToDismiss(productSheet, productSheetPanel, closeProductSheet)
 
 renderWishlist()
 
